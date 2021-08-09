@@ -38,9 +38,10 @@ namespace WeatherAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<SetHeader>();
-            services.AddScoped<IRobotService, RobotService>();
             services.AddScoped<IRequestAPI, RequestAPI>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddHostedService<TimedHostedService>();
 
             services.AddControllers();
             services.AddMemoryCache();

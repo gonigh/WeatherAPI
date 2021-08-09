@@ -31,10 +31,10 @@ namespace WeatherAPI.BO
         public static String FormatBO(WeatherBO bo)
         {
             string res = bo.city + "天气\n";
-            res += "今日天气:" + bo.weather + "\n";
+            res += "今日天气：" + bo.weather + "\n";
             res += "今日气温：" + bo.templow + "-" + bo.temphigh + "\n";
-            res += "平均气温" + bo.temp + "\n";
-            res += "此时气温" + bo.temp + "\n";
+            res += "平均气温：" + bo.temp + "\n";
+            res += "此时气温：" + bo.curtemp + "\n";
             return res;
         }
     }

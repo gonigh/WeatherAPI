@@ -8,14 +8,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WeatherAPI.BO;
-using WeatherAPI.DataAccess.Base;
-using WeatherAPI.DataAccess.Impl;
-using WeatherAPI.DataAccess.Interface;
 using WeatherAPI.IBO;
 using WeatherAPI.Models;
 using WeatherAPI.Service;
 using WeatherAPI.Service.Impl;
 using WeatherAPI.Service.Interface;
+using WeatherAPI.Utils;
 
 namespace WeatherAPI.Controller
 {
@@ -25,35 +23,38 @@ namespace WeatherAPI.Controller
     {
         private IRequestAPI api;
         private IMemoryCache _cache;
-        private IRobotService _robot;
+        private Robot _robot;
         public ReplyWeather(
             IMemoryCache cache,
-            IRobotService robot,
             IRequestAPI Iapi)
         {
             api = Iapi;
             _cache = cache;
-            _robot = robot;
+            _robot = new Robot();
         }
 
         [HttpPost("Reply")]
         public async Task<IActionResult> Reply(DingTalkRequest ding)
         {
-            
+            //处理输入信息
             String msg = ding.text.content.Trim();
             String citycode = api.GetCityCode(msg);
             if (citycode.Equals("0"))
             {
-                _robot.SendMessage("中国有 "+ msg + " 这地方吗");
+                _robot.SendMessage("中国有 " + msg + " 这地方吗");
+                return Ok();
             }
-            else if(citycode.Equals("2"))
+            else if (citycode.Equals("2"))
             {
                 _robot.SendMessage("我找到了的好多个" + msg + ",麻烦说的具体些\n" +
                     "示例：浙江/金华/浦江县\n" +
                     "省市区之间记得用用/隔开哦");
+                return Ok();
             }
+
+            //获取天气
             Weather weather = new Weather();
-            
+
             var cache = _cache.Get("city_" + citycode);
             if (cache != null)
             {
@@ -62,13 +63,17 @@ namespace WeatherAPI.Controller
             else
             {
                 weather = api.GetWeatherByCode(citycode);
-                _cache.Set<Weather>("city_" + citycode,weather,TimeSpan.FromSeconds(30));
+                _cache.Set<Weather>("city_" + citycode, weather, TimeSpan.FromSeconds(30));
             }
 
+            //处理信息
             WeatherBO bo = WeatherBO.ToWeatherBO(weather);
-            
+
+            //发送信息
             _robot.SendMessage(WeatherBO.FormatBO(bo));
             return Ok();
         }
+
+       
     }
 }

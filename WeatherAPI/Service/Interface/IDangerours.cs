@@ -1,15 +1,13 @@
-﻿using DingtalkChatbotSdk;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WeatherAPI.BO;
 
 namespace WeatherAPI.Service.Interface
 {
-    public interface IRobotService
+    public interface IDangerours
     {
-
-        public void SendMessage(string msg);
-        
+        bool IsDangerours(HttpBO bo);
     }
 }
